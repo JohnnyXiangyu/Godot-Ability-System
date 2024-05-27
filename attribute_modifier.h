@@ -1,11 +1,17 @@
 #ifndef ATTRIBUTE_MODIFIER_H
 #define ATTRIBUTE_MODIFIER_H
 
-#include "core/object/ref_counted.h"
+enum ModifierAction {
+	MODIFIER_ACTION_ADD = 0,
+	MODIFIER_ACTION_MULTIPLY = 1
+};
 
-class AttributeModifier : public RefCounted
+struct AttributeModifier
 {
-
+public:
+	int operation = 0;
+	float magnitude = 0;
+	int attribute;
 };
 
 #endif // !ATTRIBUTE_MODIFIER_H
