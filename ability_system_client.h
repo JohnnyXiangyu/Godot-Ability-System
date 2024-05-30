@@ -47,6 +47,7 @@ private:
 
 	// internal effect management
 	RID apply_effect_core(const InstigationContext &p_context);
+	void apply_singular_instant_core(const ScalerModifier &p_modifier);
 	void remove_instigation_core(RID p_handle);
 	void signal_value_change();
 

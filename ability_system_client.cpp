@@ -206,24 +206,28 @@ RID AbilitySystemClient::instigate_lasting_raw(AbilitySystemClient *p_target, co
 	return instigate_lasting(p_target, tag_events, attribute_modifiers, p_duration);
 }
 
+void AbilitySystemClient::apply_singular_instant_core(const ScalerModifier& p_modifier) {
+	changed_scalers.insert(p_modifier.attribute);
+
+	switch (p_modifier.operation) {
+		case ModifierAction::MODIFIER_ACTION_ADD:
+			scaler_base_values[p_modifier.attribute] = get_attribute_base_value(p_modifier.attribute) + p_modifier.magnitude;
+			break;
+		case ModifierAction::MODIFIER_ACTION_MULTIPLY:
+			scaler_base_values[p_modifier.attribute] = get_attribute_base_value(p_modifier.attribute) * p_modifier.magnitude;
+			break;
+	}
+}
+
 void AbilitySystemClient::instigate_instant(AbilitySystemClient *p_target, const Vector<ScalerModifier> &p_attribute_modifiers) {
 	// update attribute base values
 	for (int i = 0; i < p_attribute_modifiers.size(); i++) {
 		const ScalerModifier &attr_mod = p_attribute_modifiers[i];
-		changed_scalers.insert(attr_mod.attribute);
-
-		switch (attr_mod.operation) {
-			case ModifierAction::MODIFIER_ACTION_ADD:
-				scaler_base_values[attr_mod.attribute] = get_attribute_base_value(attr_mod.attribute) + attr_mod.magnitude;
-				break;
-			case ModifierAction::MODIFIER_ACTION_MULTIPLY:
-				scaler_base_values[attr_mod.attribute] = get_attribute_base_value(attr_mod.attribute) * attr_mod.magnitude;
-				break;
-		}
+		p_target->apply_singular_instant_core(attr_mod);
 	}
 
 	// notify observers
-	signal_value_change();
+	p_target->signal_value_change();
 }
 
 // reimplement these since there's no need for a concentrated record for individual instigations and skipping the packing process could potentially save a lot of performance
@@ -234,25 +238,12 @@ void AbilitySystemClient::instigate_instant_raw(AbilitySystemClient* p_target, c
 
 	// update attribute base values
 	for (int i = 0; i < p_modifier_operations.size(); i++) {
-		ScalerModifier new_mod;
-		new_mod.attribute = p_modifier_attributes[i];
-		new_mod.magnitude = p_modifier_magnitudes[i];
-		new_mod.operation = p_modifier_operations[i];
-
-		changed_scalers.insert(new_mod.attribute);
-
-		switch (p_modifier_operations[i]) {
-			case ModifierAction::MODIFIER_ACTION_ADD:
-				scaler_base_values[new_mod.attribute] = get_attribute_base_value(new_mod.attribute) + new_mod.magnitude;
-				break;
-			case ModifierAction::MODIFIER_ACTION_MULTIPLY:
-				scaler_base_values[new_mod.attribute] = get_attribute_base_value(new_mod.attribute) * new_mod.magnitude;
-				break;
-		}
+		ScalerModifier new_mod(p_modifier_attributes[i], p_modifier_magnitudes[i], p_modifier_operations[i]);
+		p_target->apply_singular_instant_core(new_mod);
 	}
 
 	// notify observers
-	signal_value_change();
+	p_target->signal_value_change();
 }
 
 bool AbilitySystemClient::lift_instigation(const RID &p_handle) {
