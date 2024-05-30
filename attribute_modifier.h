@@ -6,7 +6,7 @@ enum ModifierAction {
 	MODIFIER_ACTION_MULTIPLY = 1
 };
 
-struct AttributeModifier
+struct ScalerModifier
 {
 public:
 	int operation = 0;

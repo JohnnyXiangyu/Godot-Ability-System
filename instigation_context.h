@@ -11,7 +11,7 @@ struct InstigationContext
 {
 public:
 	Vector<TaggedEvent> tag_modifiers;
-	Vector<AttributeModifier> attribute_modifiers;
+	Vector<ScalerModifier> attribute_modifiers;
 
 	AbilitySystemClient *instigator;
 	AbilitySystemClient *target;
@@ -21,7 +21,7 @@ public:
 		AbilitySystemClient* p_instigator,
 		AbilitySystemClient* p_target,
 		const Vector<TaggedEvent> &p_tag_modifiers,
-		const Vector<AttributeModifier> &p_attribute_modifiers)
+		const Vector<ScalerModifier> &p_attribute_modifiers)
 	{
 		instigator = p_instigator;
 		target = p_target;
